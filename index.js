@@ -1,4 +1,5 @@
 require('dotenv').config();
+const pool = require('./database');
 
 //Importar express y crear la app
 const express = require('express');
@@ -14,3 +15,8 @@ const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
+
+pool
+  .query('SELECT NOW()')
+  .then((res) => console.log('Conectado a Postgres:', res.rows[0]))
+  .catch((err) => console.error('Error de conexión:', err.message));
