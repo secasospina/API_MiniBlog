@@ -5,10 +5,9 @@ const pool = require('./database');
 const express = require('express');
 const app = express();
 
-//Ruta de prueba
-app.get('/', (req, res) => {
-  res.json({ mensaje: 'Servidor activo' });
-});
+app.use(express.json());
+const authorsRouter = require('./routes/authors');
+app.use('/authors', authorsRouter);
 
 //Encender el servidor
 const PORT = process.env.PORT;
