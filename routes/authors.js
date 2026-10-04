@@ -12,4 +12,17 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/:id', async (req, res) => {
+  try {
+    const author = await authorsService.getAuthorById(req.params.id);
+    if (!author) {
+      return res.status(404).json({ error: 'Autor no encontrado' });
+    }
+    res.json(author);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener el autor' });
+  }
+});
+
 module.exports = router;
