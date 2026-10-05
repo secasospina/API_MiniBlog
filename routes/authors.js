@@ -25,4 +25,21 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+router.post('/', async (req, res) => {
+  try {
+    const { name, email, bio } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ error: 'name y email son obligatorios' });
+    }
+    const author = await authorsService.createAuthor(name, email, bio);
+    res.status(201).json(author);
+  } catch (err) {
+    if (err.code === '23505') {
+      return res.status(400).json({ error: 'El email ya está registrado' });
+    }
+    console.error(err);
+    res.status(500).json({ error: 'Error al crear el autor' });
+  }
+});
+
 module.exports = router;

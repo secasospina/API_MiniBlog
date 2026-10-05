@@ -10,4 +10,12 @@ async function getAuthorById(id) {
   return result.rows[0];
 }
 
-module.exports = { getAllAuthors, getAuthorById };
+async function createAuthor(name, email, bio) {
+  const result = await pool.query(
+    'INSERT INTO authors (name, email, bio) VALUES ($1, $2, $3) RETURNING *',
+    [name, email, bio]
+  );
+  return result.rows[0];
+}
+
+module.exports = { getAllAuthors, getAuthorById, createAuthor };
