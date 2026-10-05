@@ -67,4 +67,17 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+router.delete('/:id', async (req, res) => {
+  try {
+    const author = await authorsService.deleteAuthor(req.params.id);
+    if (!author) {
+      return res.status(404).json({ error: 'Autor no encontrado' });
+    }
+    res.status(204).send();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al eliminar el autor' });
+  }
+});
+
 module.exports = router;
