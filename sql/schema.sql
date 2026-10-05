@@ -20,3 +20,5 @@ CREATE TABLE posts (
     -- Configuración de la Llave Foránea apuntando a authors
     CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES authors(id) ON DELETE CASCADE
 );
+
+CREATE INDEX idx_posts_author_id ON posts(author_id);

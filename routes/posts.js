@@ -1,5 +1,6 @@
 const express = require('express');
 const postsService = require('../services/posts');
+const validateId = require('../middlewares/validateId');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
@@ -12,7 +13,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', validateId(), async (req, res) => {
   try {
     const post = await postsService.getPostById(req.params.id);
     if (!post) {
@@ -49,7 +50,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', validateId(), async (req, res) => {
   try {
     const { author_id, title, content, published } = req.body;
     if (!author_id || !title || !content) {
@@ -77,7 +78,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', validateId(), async (req, res) => {
   try {
     const post = await postsService.deletePost(req.params.id);
     if (!post) {
@@ -90,7 +91,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-router.get('/author/:authorId', async (req, res) => {
+router.get('/author/:authorId', validateId('authorId'), async (req, res) => {
   try {
     const posts = await postsService.getPostsByAuthor(req.params.authorId);
     res.json(posts);
