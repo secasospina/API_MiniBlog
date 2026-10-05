@@ -90,4 +90,14 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+router.get('/author/:authorId', async (req, res) => {
+  try {
+    const posts = await postsService.getPostsByAuthor(req.params.authorId);
+    res.json(posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener los posts del autor' });
+  }
+});
+
 module.exports = router;
