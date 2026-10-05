@@ -42,4 +42,29 @@ router.post('/', async (req, res) => {
   }
 });
 
+router.put('/:id', async (req, res) => {
+  try {
+    const { name, email, bio } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ error: 'name y email son obligatorios' });
+    }
+    const author = await authorsService.updateAuthor(
+      req.params.id,
+      name,
+      email,
+      bio
+    );
+    if (!author) {
+      return res.status(404).json({ error: 'Autor no encontrado' });
+    }
+    res.json(author);
+  } catch (err) {
+    if (err.code === '23505') {
+      return res.status(400).json({ error: 'El email ya está registrado' });
+    }
+    console.error(err);
+    res.status(500).json({ error: 'Error al actualizar el autor' });
+  }
+});
+
 module.exports = router;

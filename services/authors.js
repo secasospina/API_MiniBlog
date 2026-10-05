@@ -18,4 +18,12 @@ async function createAuthor(name, email, bio) {
   return result.rows[0];
 }
 
-module.exports = { getAllAuthors, getAuthorById, createAuthor };
+async function updateAuthor(id, name, email, bio) {
+  const result = await pool.query(
+    'UPDATE authors SET name = $1, email = $2, bio = $3 WHERE id = $4 RETURNING *',
+    [name, email, bio, id]
+  );
+  return result.rows[0];
+}
+
+module.exports = { getAllAuthors, getAuthorById, createAuthor, updateAuthor };
