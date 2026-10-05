@@ -9,6 +9,9 @@ app.use(express.json());
 const authorsRouter = require('./routes/authors');
 app.use('/authors', authorsRouter);
 
+const postsRouter = require('./routes/posts');
+app.use('/posts', postsRouter);
+
 //Encender el servidor
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
