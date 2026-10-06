@@ -1,0 +1,310 @@
+openapi: 3.0.3
+info:
+  title: API MiniBlog
+  description: API REST de un mini blog con autores y posts.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Entorno local
+  - url: https://apiminiblog-production.up.railway.app
+    description: Producción (Railway)
+
+paths:
+  /authors:
+    get:
+      tags:
+        - Autores
+      summary: Lista todos los autores
+      responses:
+        '200':
+          description: Lista de autores obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Author'
+    post:
+      tags:
+        - Autores
+      summary: Crea un nuevo autor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+              properties:
+                name:
+                  type: string
+                  example: Juan Pérez
+                email:
+                  type: string
+                  example: juan@example.com
+                bio:
+                  type: string
+                  example: Desarrollador Backend
+      responses:
+        '201':
+          description: Autor creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+        '400':
+          description: Error de validación o email duplicado
+
+  /authors/{id}:
+    get:
+      tags:
+        - Autores
+      summary: Obtiene un autor por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Autor encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+        '404':
+          description: Autor no encontrado
+    put:
+      tags:
+        - Autores
+      summary: Actualiza un autor
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                bio:
+                  type: string
+      responses:
+        '200':
+          description: Autor actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+        '404':
+          description: Autor no encontrado
+    delete:
+      tags:
+        - Autores
+      summary: Elimina un autor
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Autor eliminado correctamente
+        '404':
+          description: Autor no encontrado
+
+  /authors/{id}/posts:
+    get:
+      tags:
+        - Autores
+      summary: Obtiene todos los posts de un autor específico
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de posts del autor
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+        '404':
+          description: Autor no encontrado
+
+  /posts:
+    get:
+      tags:
+        - Posts
+      summary: Lista todos los posts
+      responses:
+        '200':
+          description: Lista de posts obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+    post:
+      tags:
+        - Posts
+      summary: Crea un nuevo post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - author_id
+                - title
+                - content
+              properties:
+                author_id:
+                  type: integer
+                  example: 1
+                title:
+                  type: string
+                  example: Mi primer post
+                content:
+                  type: string
+                  example: Contenido detallado del post...
+      responses:
+        '201':
+          description: Post creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Error de validación o autor inexistente
+
+  /posts/{id}:
+    get:
+      tags:
+        - Posts
+      summary: Obtiene un post por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Post encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Post no encontrado
+    put:
+      tags:
+        - Posts
+      summary: Actualiza un post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                published:
+                  type: boolean
+      responses:
+        '200':
+          description: Post actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Post no encontrado
+    delete:
+      tags:
+        - Posts
+      summary: Elimina un post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Post eliminado correctamente
+        '404':
+          description: Post no encontrado
+
+components:
+  schemas:
+    Author:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Juan Pérez
+        email:
+          type: string
+          example: juan@example.com
+        bio:
+          type: string
+          example: Desarrollador Backend
+        created_at:
+          type: string
+          format: date-time
+          example: '2026-10-05T23:05:18.187Z'
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        author_id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Introducción a PostgreSQL
+        content:
+          type: string
+          example: En este artículo aprenderás los conceptos básicos...
+        published:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time
+          example: '2026-10-05T23:05:18.187Z'
