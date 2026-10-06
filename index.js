@@ -1,21 +1,7 @@
 require('dotenv').config();
+const app = require('./app');
 const pool = require('./database');
 
-//Importar express y crear la app
-const express = require('express');
-const { notFound, errorHandler } = require('./middlewares/errorHandler');
-const app = express();
-
-app.use(express.json());
-const authorsRouter = require('./routes/authors');
-app.use('/authors', authorsRouter);
-const postsRouter = require('./routes/posts');
-app.use('/posts', postsRouter);
-
-app.use(notFound);
-app.use(errorHandler);
-
-//Encender el servidor
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`);
