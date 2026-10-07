@@ -14,6 +14,16 @@ const swaggerDocument = YAML.load('./openapi.yaml');
 
 app.use(express.json());
 
+// Ruta de bienvenida en la raíz
+app.get('/', (req, res) => {
+  res.json({
+    name: 'API MiniBlog',
+    status: 'ok',
+    docs: '/api-docs',
+    endpoints: ['/authors', '/posts'],
+  });
+});
+
 // Ruta de la documentación interactiva
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
