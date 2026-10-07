@@ -8,6 +8,12 @@ function isBlank(value) {
   return typeof value !== 'string' || value.trim() === '';
 }
 
+// Devuelve true si el valor es un entero positivo válido para un id de PostgreSQL (INT)
+function isValidId(value) {
+  const text = String(value);
+  return /^\d+$/.test(text) && Number(text) >= 1 && Number(text) <= 2147483647;
+}
+
 router.get('/', async (req, res) => {
   try {
     const posts = await postsService.getAllPosts();
@@ -33,11 +39,16 @@ router.get('/:id', validateId(), async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { author_id, title, content, published } = req.body;
+    const { author_id, title, content, published } = req.body ?? {};
     if (!author_id || isBlank(title) || isBlank(content)) {
       return res
         .status(400)
         .json({ error: 'author_id, title y content son obligatorios' });
+    }
+    if (!isValidId(author_id)) {
+      return res
+        .status(400)
+        .json({ error: 'author_id debe ser un número entero positivo' });
     }
     const post = await postsService.createPost(
       author_id,
@@ -57,11 +68,16 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', validateId(), async (req, res) => {
   try {
-    const { author_id, title, content, published } = req.body;
+    const { author_id, title, content, published } = req.body ?? {};
     if (!author_id || isBlank(title) || isBlank(content)) {
       return res
         .status(400)
         .json({ error: 'author_id, title y content son obligatorios' });
+    }
+    if (!isValidId(author_id)) {
+      return res
+        .status(400)
+        .json({ error: 'author_id debe ser un número entero positivo' });
     }
     const post = await postsService.updatePost(
       req.params.id,

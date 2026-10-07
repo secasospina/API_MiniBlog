@@ -33,7 +33,7 @@ router.get('/:id', validateId(), async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, email, bio } = req.body;
+    const { name, email, bio } = req.body ?? {};
     if (isBlank(name) || isBlank(email)) {
       return res.status(400).json({ error: 'name y email son obligatorios' });
     }
@@ -54,7 +54,7 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', validateId(), async (req, res) => {
   try {
-    const { name, email, bio } = req.body;
+    const { name, email, bio } = req.body ?? {};
     if (isBlank(name) || isBlank(email)) {
       return res.status(400).json({ error: 'name y email son obligatorios' });
     }
