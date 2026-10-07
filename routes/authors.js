@@ -3,6 +3,11 @@ const authorsService = require('../services/authors');
 const validateId = require('../middlewares/validateId');
 const router = express.Router();
 
+// Devuelve true si el valor no es un texto o es un texto vacío / solo espacios
+function isBlank(value) {
+  return typeof value !== 'string' || value.trim() === '';
+}
+
 router.get('/', async (req, res) => {
   try {
     const authors = await authorsService.getAllAuthors();
@@ -29,10 +34,14 @@ router.get('/:id', validateId(), async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { name, email, bio } = req.body;
-    if (!name || !email) {
+    if (isBlank(name) || isBlank(email)) {
       return res.status(400).json({ error: 'name y email son obligatorios' });
     }
-    const author = await authorsService.createAuthor(name, email, bio);
+    const author = await authorsService.createAuthor(
+      name.trim(),
+      email.trim(),
+      bio
+    );
     res.status(201).json(author);
   } catch (err) {
     if (err.code === '23505') {
@@ -46,13 +55,13 @@ router.post('/', async (req, res) => {
 router.put('/:id', validateId(), async (req, res) => {
   try {
     const { name, email, bio } = req.body;
-    if (!name || !email) {
+    if (isBlank(name) || isBlank(email)) {
       return res.status(400).json({ error: 'name y email son obligatorios' });
     }
     const author = await authorsService.updateAuthor(
       req.params.id,
-      name,
-      email,
+      name.trim(),
+      email.trim(),
       bio
     );
     if (!author) {

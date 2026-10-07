@@ -24,6 +24,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Author'
+        '500':
+          $ref: '#/components/responses/ServerError'
     post:
       tags:
         - Autores
@@ -55,7 +57,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Author'
         '400':
-          description: Error de validación o email duplicado
+          description: name o email vacíos, JSON mal formado o email duplicado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /authors/{id}:
     get:
@@ -75,8 +83,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Author'
+        '400':
+          description: ID inválido (debe ser un entero positivo)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: Autor no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
     put:
       tags:
         - Autores
@@ -93,13 +113,19 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - name
+                - email
               properties:
                 name:
                   type: string
+                  example: Juan Pérez
                 email:
                   type: string
+                  example: juan@example.com
                 bio:
                   type: string
+                  example: Desarrollador Backend
       responses:
         '200':
           description: Autor actualizado
@@ -107,46 +133,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Author'
-        '404':
-          description: Autor no encontrado
-    delete:
-      tags:
-        - Autores
-      summary: Elimina un autor
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Autor eliminado correctamente
-        '404':
-          description: Autor no encontrado
-
-  /authors/{id}/posts:
-    get:
-      tags:
-        - Autores
-      summary: Obtiene todos los posts de un autor específico
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Lista de posts del autor
+        '400':
+          description: ID inválido, name o email vacíos, JSON mal formado o email duplicado
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Post'
+                $ref: '#/components/schemas/Error'
         '404':
           description: Autor no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags:
+        - Autores
+      summary: Elimina un autor (también elimina sus posts por CASCADE)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Autor eliminado correctamente (sin contenido)
+        '400':
+          description: ID inválido (debe ser un entero positivo)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Autor no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /posts:
     get:
@@ -162,6 +189,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Post'
+        '500':
+          $ref: '#/components/responses/ServerError'
     post:
       tags:
         - Posts
@@ -186,6 +215,10 @@ paths:
                 content:
                   type: string
                   example: Contenido detallado del post...
+                published:
+                  type: boolean
+                  default: false
+                  example: false
       responses:
         '201':
           description: Post creado exitosamente
@@ -194,7 +227,42 @@ paths:
               schema:
                 $ref: '#/components/schemas/Post'
         '400':
-          description: Error de validación o autor inexistente
+          description: Faltan datos obligatorios, JSON mal formado o el autor no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /posts/author/{authorId}:
+    get:
+      tags:
+        - Posts
+      summary: Obtiene los posts de un autor con el detalle del autor
+      parameters:
+        - name: authorId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de posts del autor con nombre y email del autor (vacía si no tiene posts)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostWithAuthor'
+        '400':
+          description: ID de autor inválido (debe ser un entero positivo)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /posts/{id}:
     get:
@@ -214,8 +282,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Post'
+        '400':
+          description: ID inválido (debe ser un entero positivo)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: Post no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
     put:
       tags:
         - Posts
@@ -232,13 +312,23 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - author_id
+                - title
+                - content
               properties:
+                author_id:
+                  type: integer
+                  example: 1
                 title:
                   type: string
+                  example: Título actualizado
                 content:
                   type: string
+                  example: Contenido actualizado del post...
                 published:
                   type: boolean
+                  example: true
       responses:
         '200':
           description: Post actualizado
@@ -246,8 +336,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Post'
+        '400':
+          description: ID inválido, datos inválidos o JSON mal formado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: Post no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
     delete:
       tags:
         - Posts
@@ -259,13 +361,40 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
-          description: Post eliminado correctamente
+        '204':
+          description: Post eliminado correctamente (sin contenido)
+        '400':
+          description: ID inválido (debe ser un entero positivo)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: Post no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
 components:
+  responses:
+    ServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
   schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Mensaje que describe el error
+
     Author:
       type: object
       properties:
@@ -308,3 +437,15 @@ components:
           type: string
           format: date-time
           example: '2026-10-05T23:05:18.187Z'
+
+    PostWithAuthor:
+      allOf:
+        - $ref: '#/components/schemas/Post'
+        - type: object
+          properties:
+            author_name:
+              type: string
+              example: Juan Pérez
+            author_email:
+              type: string
+              example: juan@example.com

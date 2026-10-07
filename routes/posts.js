@@ -3,6 +3,11 @@ const postsService = require('../services/posts');
 const validateId = require('../middlewares/validateId');
 const router = express.Router();
 
+// Devuelve true si el valor no es un texto o es un texto vacío / solo espacios
+function isBlank(value) {
+  return typeof value !== 'string' || value.trim() === '';
+}
+
 router.get('/', async (req, res) => {
   try {
     const posts = await postsService.getAllPosts();
@@ -29,15 +34,15 @@ router.get('/:id', validateId(), async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { author_id, title, content, published } = req.body;
-    if (!author_id || !title || !content) {
+    if (!author_id || isBlank(title) || isBlank(content)) {
       return res
         .status(400)
         .json({ error: 'author_id, title y content son obligatorios' });
     }
     const post = await postsService.createPost(
       author_id,
-      title,
-      content,
+      title.trim(),
+      content.trim(),
       published
     );
     res.status(201).json(post);
@@ -53,7 +58,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', validateId(), async (req, res) => {
   try {
     const { author_id, title, content, published } = req.body;
-    if (!author_id || !title || !content) {
+    if (!author_id || isBlank(title) || isBlank(content)) {
       return res
         .status(400)
         .json({ error: 'author_id, title y content son obligatorios' });
@@ -61,8 +66,8 @@ router.put('/:id', validateId(), async (req, res) => {
     const post = await postsService.updatePost(
       req.params.id,
       author_id,
-      title,
-      content,
+      title.trim(),
+      content.trim(),
       published
     );
     if (!post) {
