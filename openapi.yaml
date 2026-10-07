@@ -4,6 +4,8 @@ info:
   description: API REST de un mini blog con autores y posts.
   version: 1.0.0
 servers:
+  - url: /
+    description: Servidor actual (el mismo desde donde abres esta página)
   - url: http://localhost:3000
     description: Entorno local
   - url: https://apiminiblog-production.up.railway.app
